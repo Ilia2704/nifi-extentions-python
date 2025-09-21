@@ -46,7 +46,7 @@ class LLM_response(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
 
     class ProcessorDetails:
-        version = "0.3.1"
+        version = "0.3.2"
         description = "Calls your `request(prompt, api_key)` (Gemini) with entire FlowFile content."
         tags = ["LLM", "python", "transform", "google", "gemini", "generative ai"]
 

@@ -22,6 +22,7 @@ jobs:
 
       - name: Run Tests
         env:
+          GOOGLE_AI_API_KEY: ${{ vars.GOOGLE_AI_API_KEY }}
           PYTHONPATH: ./src        
         run: pytest tests -q
 
