@@ -1,0 +1,41 @@
+from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
+from nifiapi.relationship import Relationship
+from hello_processor import hello
+
+class HelloTransform(FlowFileTransform):
+    """
+    Простой трансформер:
+      - ставит атрибут greeting=Hello
+      - контент: 'Hello' или 'Hello ' + исходный контент
+    """
+
+    class Java:
+        implements = ['org.apache.nifi.python.processor.FlowFileTransform']
+
+    class ProcessorDetails:
+        version = "0.1.0"
+        description = "Adds greeting=Hello and prefixes content with 'Hello ' (or sets 'Hello' if empty)."
+        tags = ["hello", "python", "transform"]
+
+    def getRelationships(self):
+        # Явно объявим стандартные реляции (чтобы было видно в UI)
+        return [
+            Relationship(name="success", description="Processed successfully"),
+            Relationship(name="failure", description="Processing failed"),
+        ]
+
+    def transform(self, context, flowfile):
+        try:
+            data = flowfile.getContentsAsBytes() or b""
+            new_body, new_attrs = hello.transform(data)
+            return FlowFileTransformResult(
+                relationship="success",
+                contents=new_body,
+                attributes=new_attrs
+            )
+        except Exception as e:
+            return FlowFileTransformResult(
+                relationship="failure",
+                contents=None,
+                attributes={"error": str(e)[:512]}
+            )
