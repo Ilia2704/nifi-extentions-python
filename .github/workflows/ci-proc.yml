@@ -25,6 +25,9 @@ jobs:
           PYTHONPATH: ./src        
         run: pytest tests/stab_test -q
 
-      
+      - name: Run Module Tests
+        env:
+          PYTHONPATH: ./src        
+        run: pytest tests -q
 
         
