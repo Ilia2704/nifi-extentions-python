@@ -70,9 +70,3 @@ jobs:
 
           echo "Deploy done. Manually restart NiFi on the server (e.g., sudo systemctl restart nifi)."
       
-      - name: Restart NiFi service
-        shell: bash
-        run: |
-          set -e
-          ssh -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no "$HOST" \
-            'sudo systemctl restart nifi && echo "NiFi restarted ✅" || (sudo systemctl status nifi --no-pager; exit 1)'
