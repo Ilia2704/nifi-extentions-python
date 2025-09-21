@@ -22,7 +22,51 @@ jobs:
 
       - name: Run Tests
         env:
+          GOOGLE_AI_API_KEY: ${{ vars.GOOGLE_AI_API_KEY }}
           PYTHONPATH: ./src        
         run: pytest tests -q
 
-        
+      - name: Write SSH key
+        shell: bash
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.NIFI_SSH_KEY }}" > ~/.ssh/id_nifi
+          chmod 600 ~/.ssh/id_nifi
+
+      - name: Test SSH connectivity
+        shell: bash
+        env:
+          HOST: "ubuntu@158.160.22.243"  
+        run: |
+          set -e
+          echo "Testing SSH to $HOST ..."
+          ssh -i ~/.ssh/id_nifi \
+              -o StrictHostKeyChecking=no \
+              -o BatchMode=yes \
+              -o ConnectTimeout=10 \
+              -T "$HOST" 'echo "✅ SSH OK: $(whoami)@$(hostname) IP: $(hostname -I | awk '\''{print $1}'\'')"'
+          echo "SSH connectivity test: OK"
+
+      - name: Deploy processors (.py only) via rsync
+        shell: bash
+        env:
+          HOST: "ubuntu@158.160.22.243"              
+          REMOTE_DIR: "/opt/nifi/python/extensions"  
+        run: |
+          set -e
+          ssh -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no "$HOST" "mkdir -p '$REMOTE_DIR'"
+          rsync -avz \
+            -e "ssh -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no" \
+            --include='*/' --include='*.py' --exclude='*' \
+            src/ "$HOST:$REMOTE_DIR/"
+
+          # distribute the same requirements.txt into each processor folder
+          for d in src/*; do
+            [ -d "$d" ] || continue
+            pkg="$(basename "$d")"
+            scp -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no requirements.txt \
+              "$HOST:$REMOTE_DIR/$pkg/requirements.txt"
+          done
+
+          echo "Deploy done. Manually restart NiFi on the server (e.g., sudo systemctl restart nifi)."
+      
