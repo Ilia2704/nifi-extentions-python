@@ -1,6 +1,9 @@
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 from nifiapi.relationship import Relationship
-from hello_processor import hello
+try:
+    import hello              
+except ImportError:
+    from hello_processor import hello
 
 class HelloTransform(FlowFileTransform):
     """

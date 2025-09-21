@@ -20,12 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Stab Test
-        env:
-          PYTHONPATH: ./src        
-        run: pytest tests/stab_test -q
-
-      - name: Run Module Tests
+      - name: Run Tests
         env:
           PYTHONPATH: ./src        
         run: pytest tests -q
