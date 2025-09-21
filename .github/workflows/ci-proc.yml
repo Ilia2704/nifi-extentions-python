@@ -23,7 +23,7 @@ jobs:
       - name: Run Stab Test
         env:
           PYTHONPATH: ./src        
-        run: pytest tests/test_hello -q
+        run: pytest tests/stab_test -q
 
       - name: Run tests
         env:
