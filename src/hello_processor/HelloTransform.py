@@ -16,7 +16,7 @@ class HelloTransform(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
 
     class ProcessorDetails:
-        version = "0.1.2"
+        version = "0.1.4"
         description = "Adds greeting=Hello and prefixes content with 'Hello ' (or sets 'Hello' if empty)."
         tags = ["hello", "python", "transform"]
 
