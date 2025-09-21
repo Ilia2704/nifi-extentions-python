@@ -1,5 +1,7 @@
 # nifi-extentions-python
+
 Here is the template and small sandbox to create your own nifi-processor with python env for NiFi 2.x
+
 # NiFi Python Processor — Deploy & Runtime Guide
 
 This README gives you **copy-paste** commands to:
@@ -47,6 +49,8 @@ pip install -r requirements.txt
 pip install pytest
 
 pytest -q
+
+pytest tests -q
 ```
 
 ---
@@ -203,6 +207,7 @@ tail -n 200 /opt/nifi/logs/nifi-app.log | grep -Ei "python|extensions|hello_proc
       try: super().__init__()
       except Exception: pass
   ```
+
 * **NiFi can’t create venv:** `sudo apt-get install -y python3-venv`.
 * **Permissions:** ensure the NiFi service user can write to `$NIFI_HOME/work/python`:
 
@@ -215,7 +220,7 @@ tail -n 200 /opt/nifi/logs/nifi-app.log | grep -Ei "python|extensions|hello_proc
 
 ## 7) Deployment checklist
 
-1. Run tests locally: `pytest -q` → green.
+1. Run tests locally: `pytest tests -q` → green.
 2. Upload `src/*` to `/opt/nifi/python/extensions/`.
 3. Ensure `requirements.txt` lives inside each processor package.
 4. Refresh venv: **A)** bump `ProcessorDetails.version` and restart NiFi, **or**

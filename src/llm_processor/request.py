@@ -1,11 +1,13 @@
 from google import genai
 
-api_key = "AIzaSyAo8AuWdvYOLfcA8IuL4LgWa8UyoonbI0g"
+def creale_client(api_key: str):
+    return genai.Client(api_key = api_key)
 
-client = genai.Client(api_key = api_key)
+def request(prompt: str, api_key: str) -> str:
+     client = creale_client(api_key)
 
-resp = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Скажи 'ok' и назови свой модельный идентификатор. После этого скажи 'привет мир' на русском языке."
-)
-print(resp.text)
+     resp = client.models.generate_content(
+         model="gemini-2.5-flash",
+         contents=prompt
+     )
+     return resp.text
