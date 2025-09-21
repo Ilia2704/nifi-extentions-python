@@ -16,12 +16,18 @@ class HelloTransform(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
 
     class ProcessorDetails:
-        version = "0.1.0"
+        version = "0.1.2"
         description = "Adds greeting=Hello and prefixes content with 'Hello ' (or sets 'Hello' if empty)."
         tags = ["hello", "python", "transform"]
 
+    def __init__(self, jvm=None, **kwargs):
+        self.jvm = jvm
+        try:
+            super().__init__() 
+        except Exception:
+            pass
+
     def getRelationships(self):
-        # Явно объявим стандартные реляции (чтобы было видно в UI)
         return [
             Relationship(name="success", description="Processed successfully"),
             Relationship(name="failure", description="Processing failed"),
