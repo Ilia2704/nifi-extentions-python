@@ -46,3 +46,19 @@ jobs:
               -o ConnectTimeout=10 \
               -T "$HOST" 'echo "✅ SSH OK: $(whoami)@$(hostname) IP: $(hostname -I | awk '\''{print $1}'\'')"'
           echo "SSH connectivity test: OK"
+
+      - name: Deploy processors via SCP (public IP)
+        shell: bash
+        env:
+          HOST: "ubuntu@158.160.22.243"            
+          REMOTE_DIR: "/opt/nifi/python/extensions"
+        run: |
+          scp -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no -r src/* "$HOST:$REMOTE_DIR/"
+
+          for d in src/*; do
+            pkg="$(basename "$d")"
+            scp -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no requirements.txt \
+              "$HOST:$REMOTE_DIR/$pkg/requirements.txt"
+          done
+
+          echo "Deploy done. Manually restart NiFi on the server (e.g., sudo systemctl restart nifi)."
