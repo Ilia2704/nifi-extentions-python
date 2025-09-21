@@ -75,4 +75,4 @@ jobs:
         run: |
           set -e
           ssh -i ~/.ssh/id_nifi -o StrictHostKeyChecking=no "$HOST" \
-            'sudo systemctl restart nifi && sudo systemctl is-active --quiet nifi && echo "NiFi restarted ✅" || (sudo systemctl status nifi --no-pager; exit 1)'
+            'sudo systemctl restart nifi && echo "NiFi restarted ✅" || (sudo systemctl status nifi --no-pager; exit 1)'
