@@ -8,7 +8,7 @@ from pathlib import Path
 try:
     import request
 except ImportError:
-    from llm_processor import request  
+    from llm_processor import request  # type: ignore
 
 
 def _load_dotenv_once():
@@ -20,16 +20,13 @@ def _load_dotenv_once():
                     if not line or line.startswith("#") or "=" not in line:
                         continue
                     k, v = line.split("=", 1)
-                    k = k.strip()
-                    v = v.strip().strip('"').strip("'")
-                    os.environ.setdefault(k, v)
+                    os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
             except Exception:
                 pass
             break
 
 
 def _prop_value(context, name: str, default: str = "") -> str:
-    """Аккуратно достаём строку из PropertyValue/str."""
     val = context.getProperty(name)
     if val is None:
         return default
@@ -54,33 +51,22 @@ class LLM_response(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
 
     class ProcessorDetails:
-        version = "0.3.3"  
-        description = "Calls your `request(prompt, api_key)` (Gemini) with entire FlowFile content."
-        tags = ["LLM", "python", "transform", "google", "gemini", "generative ai"]
+        version = "0.3.4"  # ↑ bump для сброса кеша
+        description = "Send entire FlowFile content to Gemini via request(prompt, api_key)."
+        tags = ["LLM", "python", "google", "gemini", "transform"]
 
+    # --- Ровно два свойства, без defaultValue/allowableValues ---
     _PD_API_KEY = PropertyDescriptor(
         name="api_key",
-        description="Google Generative AI API key. If empty, uses env GOOGLE_AI_API_KEY (from .env or process env).",
+        description="Google Generative AI API key. If empty, uses env GOOGLE_AI_API_KEY.",
         required=False,
         sensitive=True,
-        defaultValue=""
     )
-
     _PD_SYSTEM_PROMPT = PropertyDescriptor(
         name="system_prompt",
         description="Optional system instruction (prefixed to user content).",
         required=False,
         sensitive=False,
-        defaultValue=""
-    )
-
-    _PD_RESPONSE_FORMAT = PropertyDescriptor(
-        name="response_format",
-        description="Output format: 'text' or 'json'.",
-        required=False,
-        sensitive=False,
-        defaultValue="text",
-        allowableValues=["text", "json"]
     )
 
     def __init__(self, jvm=None, **kwargs):
@@ -98,7 +84,7 @@ class LLM_response(FlowFileTransform):
         ]
 
     def getPropertyDescriptors(self):
-        return [self._PD_API_KEY, self._PD_SYSTEM_PROMPT, self._PD_RESPONSE_FORMAT]
+        return [self._PD_API_KEY, self._PD_SYSTEM_PROMPT]
 
     @staticmethod
     def _make_prompt(user_text: str, system_prompt: str) -> str:
@@ -112,32 +98,19 @@ class LLM_response(FlowFileTransform):
         env_key = os.getenv("GOOGLE_AI_API_KEY", "").strip()
         if env_key:
             return env_key
-        raise ValueError(
-            "API key is missing. Set processor property 'api_key' "
-            "or environment variable GOOGLE_AI_API_KEY (optionally via .env)."
-        )
+        raise ValueError("API key missing: set processor property 'api_key' or env GOOGLE_AI_API_KEY.")
 
     def transform(self, context, flowfile):
         try:
             api_key = self._get_api_key(context)
             system_prompt = _prop_value(context, "system_prompt")
-            response_format = _prop_value(context, "response_format", "text").lower()
-            if response_format not in ("text", "json"):
-                response_format = "text"
 
             data = flowfile.getContentsAsBytes() or b""
             user_text = data.decode("utf-8", errors="replace")
             prompt = self._make_prompt(user_text, system_prompt)
 
             model_text = request.request(prompt=prompt, api_key=api_key) or ""
-
-            if response_format == "json":
-                import json as _json
-                out_bytes = _json.dumps({"text": model_text}, ensure_ascii=False).encode("utf-8")
-                fmt = "json"
-            else:
-                out_bytes = model_text.encode("utf-8")
-                fmt = "text"
+            out_bytes = model_text.encode("utf-8")
 
             return FlowFileTransformResult(
                 relationship="success",
@@ -145,7 +118,8 @@ class LLM_response(FlowFileTransform):
                 attributes={
                     "llm.provider": "google",
                     "llm.client": "google.genai",
-                    "llm.format": fmt,
+                    "llm.model": "gemini-2.5-flash",
+                    "llm.format": "text",
                 },
             )
         except Exception as e:
