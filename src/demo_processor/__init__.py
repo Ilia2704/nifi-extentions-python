@@ -13,7 +13,7 @@ from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 from nifiapi.relationship import Relationship  # imported for symmetry/demo, not used directly
 
 # Import pure business logic from the local module
-from .swap import swap_top_level
+from swap import swap_top_level
 
 
 class JsonKeyValueSwap(FlowFileTransform):
@@ -37,7 +37,7 @@ class JsonKeyValueSwap(FlowFileTransform):
     # Metadata that NiFi shows in the UI for this processor.
     class ProcessorDetails:
         # Version of this processor implementation.
-        version = "0.1.0"
+        version = "0.1.1"
 
         # Short human-readable description.
         description = (
