@@ -37,7 +37,7 @@ class JsonKeyValueSwap(FlowFileTransform):
     # Metadata that NiFi shows in the UI for this processor.
     class ProcessorDetails:
         # Version of this processor implementation.
-        version = "0.1.1"
+        version = "0.1.2"
 
         # Short human-readable description.
         description = (
@@ -52,16 +52,28 @@ class JsonKeyValueSwap(FlowFileTransform):
         # Optional: list of PyPI dependencies (empty for this simple demo).
         dependencies = []
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, jvm=None, **kwargs):
         """
-        Processor constructor.
+        Proper constructor for NiFi Python FlowFileTransform processors.
 
-        NiFi creates a single instance of this class and may call transform()
-        many times from different threads. Avoid storing FlowFile-related
-        state on self.
+        NiFi always instantiates processors as:
+            ProcessorClass(jvm=gateway.jvm)
+
+        The base FlowFileTransform.__init__ does NOT accept arguments,
+        so we must not pass 'jvm' or **kwargs to super().
         """
-        # Always call base class constructor as recommended by NiFi docs.
-        super().__init__(**kwargs)
+
+        # Store JVM reference if needed
+        self.jvm = jvm
+
+        # Call base constructor without arguments for compatibility
+        try:
+            super().__init__()
+        except TypeError:
+            pass
+        except Exception:
+            pass
+
 
     # We do NOT override getPropertyDescriptors() or getRelationships()
     # for this demo. In that case NiFi uses default relationships for
