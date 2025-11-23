@@ -1,6 +1,6 @@
 # tests/test_hello.py
 import pytest
-from hello_processor.hello import transform
+from demo_processor.hello import transform
 
 def test_empty_body():
     out, attrs = transform(b"")
