@@ -12,3 +12,7 @@ if src_dir.is_dir() and str(src_dir) not in sys.path:
 demo_proc_dir = src_dir / "demo_processor"
 if demo_proc_dir.is_dir() and str(demo_proc_dir) not in sys.path:
     sys.path.insert(0, str(demo_proc_dir))
+
+llm_proc_dir = src_dir / "llm_processor"
+if llm_proc_dir.is_dir() and str(llm_proc_dir) not in sys.path:
+    sys.path.insert(0, str(llm_proc_dir))

@@ -146,3 +146,22 @@ class JsonKeyValueSwap(FlowFileTransform):
                     "json.swap.error": error_message,
                 },
             )
+
+    def getRelationships(self):
+        """
+        Explicitly declare processor relationships for tests and NiFi.
+
+        We define:
+          - success : JSON processed and swapped
+          - failure : any error during decode/parse/swap
+        """
+        return [
+            Relationship(
+                name="success",
+                description="JSON successfully swapped (keys <-> values)"
+            ),
+            Relationship(
+                name="failure",
+                description="Error while processing JSON; original content kept"
+            ),
+        ]
