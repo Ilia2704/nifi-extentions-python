@@ -4,7 +4,6 @@
 Теперь с подробным логированием.
 """
 import os
-import re
 import importlib
 import inspect
 import logging
@@ -23,18 +22,30 @@ SRC_ROOT = Path(os.environ.get("NIFI_SRC_ROOT", "src")).resolve()
 
 def _iter_module_names() -> Iterable[str]:
     """
-    Формируем имена модулей вида '<pkg>.<module>' для каждого src/<pkg>/*.py.
-    Работает с namespace-пакетами (без __init__.py).
+    Формируем имена модулей вида:
+      - '<pkg>'           для src/<pkg>/__init__.py
+      - '<pkg>.<module>'  для src/<pkg>/*.py (кроме __init__.py)
+
+    Работает и с обычными пакетами, и с namespace-пакетами.
     """
     if not SRC_ROOT.is_dir():
         log.warning("SRC root not found: %s", SRC_ROOT)
         return
+
     for pkg_dir in SRC_ROOT.iterdir():
         if not pkg_dir.is_dir() or pkg_dir.name.startswith(("_", ".")):
             continue
+
         pkg = pkg_dir.name
+
+        init_py = pkg_dir / "__init__.py"
+        if init_py.is_file():
+            yield pkg
+
         for py in pkg_dir.glob("*.py"):
-            if py.name.startswith(("_", "__")):
+            if py.name.startswith("_"):
+                continue
+            if py.name == "__init__.py":
                 continue
             mod = f"{pkg}.{py.stem}"
             yield mod
@@ -131,7 +142,18 @@ def test_all_processors_contract_and_smoke():
                         self._data = data
                     def getContentsAsBytes(self):
                         return self._data
-                class _Ctx: pass
+                class _Ctx: 
+                    def getProperty(self, name):
+                        # Значения по умолчанию для Smoke-тесирования.
+                        # Реальных внешних вызовов не будет — HOST/PORT пустые моки.
+                        defaults = {
+                            "HOST": "localhost",
+                            "PORT": "8000",
+                            "System Prompt": "",
+                            "Temperature": "0.7",
+                        }
+                        return defaults.get(name, "")
+
 
                 res = proc.transform(_Ctx(), _FF())
                 assert isinstance(res, FlowFileTransformResult)
@@ -149,7 +171,17 @@ def test_all_processors_contract_and_smoke():
                 assert "success" in rels
                 _assert_properties(proc)
 
-                class _Ctx: pass
+                class _Ctx:
+                    def getProperty(self, name):
+                        # Значения по умолчанию для Smoke-тесирования.
+                        # Реальных внешних вызовов не будет — HOST/PORT пустые моки.
+                        defaults = {
+                            "HOST": "localhost",
+                            "PORT": "8000",
+                            "System Prompt": "",
+                            "Temperature": "0.7",
+                        }
+                        return defaults.get(name, "")
                 res = proc.create(_Ctx())
                 if res is None:
                     log.info("Smoke result: create() returned None (no FlowFile this tick)")
@@ -169,7 +201,17 @@ def test_all_processors_contract_and_smoke():
                 assert "success" in rels
                 _assert_properties(proc)
 
-                class _Ctx: pass
+                class _Ctx: 
+                    def getProperty(self, name):
+                        # Значения по умолчанию для Smoke-тесирования.
+                        # Реальных внешних вызовов не будет — HOST/PORT пустые моки.
+                        defaults = {
+                            "HOST": "localhost",
+                            "PORT": "8000",
+                            "System Prompt": "",
+                            "Temperature": "0.7",
+                        }
+                        return defaults.get(name, "")
                 sample = {"a": 1}
                 res = proc.transform(_Ctx(), sample)
                 assert isinstance(res, RecordTransformResult)
