@@ -76,6 +76,16 @@ Designed to plug directly into any NiFi flow.
 
 # NiFi Python Processor — Deploy & Runtime Guide
 
+## Tech Stack
+
+- Apache NiFi 2.x
+- Python 3
+- NiFi Python Extensions API
+- GitHub Actions (CI/CD)
+- REST APIs
+- LLM providers (OpenAI-compatible)
+- Linux deployment
+
 ## Project layout
 
 ```
@@ -302,4 +312,4 @@ Showcases:
 - LLM integration
 - production-grade ETL engineering
 
-Useful for teams building intelligent data pipelines.
+This project demonstrates how to embed AI capabilities directly into NiFi data flows without external microservices, reducing architecture complexity and operational overhead. Useful for teams building intelligent data pipelines.
