@@ -1,6 +1,6 @@
 # nifi-extensions-python
 
-Production-ready Apache NiFi Python extension framework with LLM integration and automated CI/CD deployment
+Apache NiFi Python extension framework with LLM integration and automated CI/CD deployment
 
 ---
 
