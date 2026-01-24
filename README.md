@@ -1,17 +1,80 @@
-# nifi-extentions-python
+# nifi-extensions-python
 
-Here is the template and small sandbox to create your own nifi-processor with python env for NiFi 2.x
-
-# NiFi Python Processor — Deploy & Runtime Guide
-
-This README gives you **copy-paste** commands to:
-
-* set up local dev/tests,
-* ship your processor package(s) to a remote NiFi box,
-* (re)create/update the processor’s Python environment (venv) on the server,
-* and see where to configure NiFi for Python extensions.
+Production-ready Apache NiFi Python extension framework with LLM integration and automated CI/CD deployment
 
 ---
+
+## Overview
+
+Production-ready example of building **custom Apache NiFi processors in Python**,  
+packaging them as **NiFi extensions**, and deploying automatically via **CI/CD**.
+
+This project demonstrates how to:
+
+- build NiFi processors in pure Python
+- integrate NiFi flows with Large Language Models (LLMs)
+- package extensions for NiFi 2.x runtime
+- automate build, test, and deployment with GitHub Actions
+- run processors safely in production environments
+
+Designed as a reference implementation.
+Includes packaging, dependency isolation, automated builds, and safe deployment patterns.
+
+
+## Business Problem
+
+Many data pipelines require intelligent enrichment:
+
+- classify or summarize text
+- extract entities
+- generate metadata
+- apply AI-based transformations
+
+Apache NiFi does not provide native LLM processors.
+
+This project shows how to extend NiFi with Python processors to enable AI-powered flows in a production-friendly way.
+
+### Example use cases
+
+- document enrichment
+- support ticket categorization
+- log summarization
+- fraud signal extraction
+- smart routing
+
+
+## Architecture
+
+<img width="1386" height="747" alt="image" src="https://github.com/user-attachments/assets/2f109326-5455-4ebb-9d67-ee0a5e44383a" />
+
+High-level flow:
+
+FlowFiles → Python Processor → LLM REST API → Enriched FlowFiles  
+Built and deployed automatically through GitHub Actions CI/CD
+
+## Features
+
+- Custom NiFi processors written in Python
+- Independent virtual environments per processor
+- LLM integration via REST APIs (OpenAI-compatible)
+- Packaging & deployment automation
+- GitHub Actions CI/CD pipeline
+- Safe production patterns (timeouts, retries, rate limits)
+- Works with NiFi 2.x Python extensions framework
+
+## Quick Demo
+
+Example processor:
+- reads FlowFile text
+- calls LLM API
+- enriches attributes/content
+- returns enriched FlowFile to NiFi
+
+Designed to plug directly into any NiFi flow.
+
+---
+
+# NiFi Python Processor — Deploy & Runtime Guide
 
 ## Project layout
 
@@ -228,3 +291,15 @@ tail -n 200 /opt/nifi/logs/nifi-app.log | grep -Ei "python|extensions|hello_proc
    **C)** install deps into the found venv.
 5. Run the self-check script; confirm the processor is **Valid** in the NiFi UI.
 6. Mark `original` as **Auto-terminate** if you don’t use it.
+
+# Why This Project Matters
+
+Showcases:
+
+- Apache NiFi extension development
+- Python systems programming
+- CI/CD automation
+- LLM integration
+- production-grade ETL engineering
+
+Useful for teams building intelligent data pipelines.
