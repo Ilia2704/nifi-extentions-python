@@ -36,7 +36,7 @@ jobs:
       - name: Test SSH connectivity
         shell: bash
         env:
-          HOST: "ubuntu@158.160.22.243"  
+          HOST: "ubuntu@158.160.95.34"  
         run: |
           set -e
           echo "Testing SSH to $HOST ..."
