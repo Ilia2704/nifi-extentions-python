@@ -50,7 +50,7 @@ jobs:
       - name: Deploy processors (.py only) via rsync
         shell: bash
         env:
-          HOST: "ubuntu@158.160.22.243"              
+          HOST: "ubuntu@158.160.95.34"              
           REMOTE_DIR: "/opt/nifi/python/extensions"  
         run: |
           set -e
