@@ -9,6 +9,8 @@ Apache NiFi Python extension framework with LLM integration and automated CI/CD 
 Production-ready example of building **custom Apache NiFi processors in Python**,  
 packaging them as **NiFi extensions**, and deploying automatically via **CI/CD**.
 
+https://nifi.apache.org/nifi-docs/python-developer-guide.html
+
 This project demonstrates how to:
 
 - build NiFi processors in pure Python

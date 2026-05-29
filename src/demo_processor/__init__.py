@@ -37,7 +37,7 @@ class JsonKeyValueSwap(FlowFileTransform):
     # Metadata that NiFi shows in the UI for this processor.
     class ProcessorDetails:
         # Version of this processor implementation.
-        version = "0.1.3"
+        version = "0.1.4"
 
         # Short human-readable description.
         description = (
